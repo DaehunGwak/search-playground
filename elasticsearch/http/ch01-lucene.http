@@ -1,0 +1,24 @@
+### default localhost info
+GET http://localhost:9200
+
+### Elasticsearch plugins
+GET http://localhost:9200/_cat/plugins?format=json
+
+### analyze with nori
+GET http://localhost:9200/_analyze
+Content-Type: application/json
+
+{
+    "analyzer": "nori",
+    "text": "안녕하세요. Elasticsearch를 이용해서 개발하고 있는 검색 개발자입니다."
+}
+
+### tokenize with nori
+GET http://localhost:9200/_analyze
+Content-Type: application/json
+
+{
+  "tokenizer": "nori_tokenizer",
+  "text": "안녕하세요. Elasticsearch를 이용해서 개발하고 있는 검색 개발자입니다."
+}
+
