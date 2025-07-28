@@ -1,0 +1,546 @@
+### Function Score Query 테스트용 Track 인덱스 관리
+
+### 1. Track 인덱스 생성
+PUT {{host}}/tracks
+Content-Type: application/json
+
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  },
+  "mappings": {
+    "properties": {
+      "title": {
+        "type": "text",
+        "analyzer": "standard"
+      },
+      "artist": {
+        "type": "text",
+        "analyzer": "standard"
+      },
+      "genre": {
+        "type": "keyword"
+      },
+      "release_date": {
+        "type": "date",
+        "format": "yyyy-MM-dd"
+      },
+      "duration_seconds": {
+        "type": "integer"
+      },
+      "popularity_score": {
+        "type": "float"
+      },
+      "play_count": {
+        "type": "long"
+      },
+      "rating": {
+        "type": "float"
+      },
+      "custom_boost": {
+        "type": "float"
+      },
+      "tags": {
+        "type": "keyword"
+      }
+    }
+  }
+}
+
+### Track 인덱스 확인
+GET {{host}}/tracks
+
+### Track 인덱스 삭제 (필요시)
+DELETE {{host}}/tracks
+
+### 2. Track 데이터 생성 (단일 문서)
+
+### 인기 팝 트랙 1
+POST {{host}}/tracks/_doc/1
+Content-Type: application/json
+
+{
+  "title": "Shape of You",
+  "artist": "Ed Sheeran",
+  "genre": "pop",
+  "release_date": "2017-01-06",
+  "duration_seconds": 263,
+  "popularity_score": 9.5,
+  "play_count": 2850000000,
+  "rating": 4.8,
+  "custom_boost": 1.5,
+  "tags": ["popular", "mainstream", "chart-topper"]
+}
+
+### 클래식 록 트랙
+POST {{host}}/tracks/_doc/2
+Content-Type: application/json
+
+{
+  "title": "Bohemian Rhapsody",
+  "artist": "Queen",
+  "genre": "rock",
+  "release_date": "1975-10-31",
+  "duration_seconds": 355,
+  "popularity_score": 9.8,
+  "play_count": 1900000000,
+  "rating": 4.9,
+  "custom_boost": 2.0,
+  "tags": ["classic", "legendary", "epic"]
+}
+
+### 최신 힙합 트랙
+POST {{host}}/tracks/_doc/3
+Content-Type: application/json
+
+{
+  "title": "God's Plan",
+  "artist": "Drake",
+  "genre": "hip-hop",
+  "release_date": "2018-01-19",
+  "duration_seconds": 198,
+  "popularity_score": 8.9,
+  "play_count": 1800000000,
+  "rating": 4.5,
+  "custom_boost": 1.2,
+  "tags": ["trending", "modern", "urban"]
+}
+
+### 인디 록 트랙
+POST {{host}}/tracks/_doc/4
+Content-Type: application/json
+
+{
+  "title": "Mr. Brightside",
+  "artist": "The Killers",
+  "genre": "indie-rock",
+  "release_date": "2003-09-29",
+  "duration_seconds": 222,
+  "popularity_score": 7.8,
+  "play_count": 850000000,
+  "rating": 4.6,
+  "custom_boost": 0.9,
+  "tags": ["indie", "alternative", "2000s"]
+}
+
+### 재즈 트랙
+POST {{host}}/tracks/_doc/5
+Content-Type: application/json
+
+{
+  "title": "Take Five",
+  "artist": "Dave Brubeck",
+  "genre": "jazz",
+  "release_date": "1959-06-25",
+  "duration_seconds": 324,
+  "popularity_score": 6.5,
+  "play_count": 45000000,
+  "rating": 4.7,
+  "custom_boost": 0.7,
+  "tags": ["classic-jazz", "instrumental", "sophisticated"]
+}
+
+### 일렉트로닉 트랙
+POST {{host}}/tracks/_doc/6
+Content-Type: application/json
+
+{
+  "title": "One More Time",
+  "artist": "Daft Punk",
+  "genre": "electronic",
+  "release_date": "2000-11-13",
+  "duration_seconds": 320,
+  "popularity_score": 8.2,
+  "play_count": 560000000,
+  "rating": 4.4,
+  "custom_boost": 1.1,
+  "tags": ["electronic", "dance", "french-house"]
+}
+
+### 추가 트랙 데이터 생성 (개별 요청)
+
+### 마이클 잭슨 트랙
+POST {{host}}/tracks/_doc/7
+Content-Type: application/json
+
+{
+  "title": "Billie Jean",
+  "artist": "Michael Jackson",
+  "genre": "pop",
+  "release_date": "1983-01-02",
+  "duration_seconds": 294,
+  "popularity_score": 9.7,
+  "play_count": 950000000,
+  "rating": 4.9,
+  "custom_boost": 1.8,
+  "tags": ["pop", "classic", "king-of-pop"]
+}
+
+### 레드 제플린 트랙
+POST {{host}}/tracks/_doc/8
+Content-Type: application/json
+
+{
+  "title": "Stairway to Heaven",
+  "artist": "Led Zeppelin",
+  "genre": "rock",
+  "release_date": "1971-11-08",
+  "duration_seconds": 482,
+  "popularity_score": 9.6,
+  "play_count": 780000000,
+  "rating": 4.8,
+  "custom_boost": 1.9,
+  "tags": ["rock", "classic", "epic"]
+}
+
+### 너바나 트랙
+POST {{host}}/tracks/_doc/9
+Content-Type: application/json
+
+{
+  "title": "Smells Like Teen Spirit",
+  "artist": "Nirvana",
+  "genre": "grunge",
+  "release_date": "1991-09-10",
+  "duration_seconds": 301,
+  "popularity_score": 8.7,
+  "play_count": 680000000,
+  "rating": 4.7,
+  "custom_boost": 1.3,
+  "tags": ["grunge", "alternative", "90s"]
+}
+
+### 이글스 트랙
+POST {{host}}/tracks/_doc/10
+Content-Type: application/json
+
+{
+  "title": "Hotel California",
+  "artist": "Eagles",
+  "genre": "rock",
+  "release_date": "1976-12-08",
+  "duration_seconds": 391,
+  "popularity_score": 9.2,
+  "play_count": 720000000,
+  "rating": 4.8,
+  "custom_boost": 1.6,
+  "tags": ["rock", "classic", "storytelling"]
+}
+
+### 모든 트랙 조회
+GET {{host}}/tracks/_search
+
+### (참고) 올바른 벌크 데이터 생성 방법
+### 주의: 마지막 줄 뒤에 반드시 빈 줄이 있어야 함
+POST {{host}}/tracks/_bulk
+Content-Type: application/x-ndjson
+
+{"index": {"_id": "11"}}
+{"title": "Sweet Child O' Mine", "artist": "Guns N' Roses", "genre": "rock", "release_date": "1987-06-01", "duration_seconds": 356, "popularity_score": 9.1, "play_count": 1200000000, "rating": 4.7, "custom_boost": 1.4, "tags": ["rock", "classic", "guitar"]}
+{"index": {"_id": "12"}}
+{"title": "Imagine", "artist": "John Lennon", "genre": "pop", "release_date": "1971-09-09", "duration_seconds": 183, "popularity_score": 9.4, "play_count": 800000000, "rating": 4.9, "custom_boost": 1.7, "tags": ["pop", "peace", "classic"]}
+
+### 3. Function Score Query 테스트
+
+### 3.1 기본 Function Score Query - 인기도 점수로 부스트
+GET {{host}}/tracks/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "match_all": {}
+      },
+      "functions": [
+        {
+          "field_value_factor": {
+            "field": "popularity_score",
+            "factor": 0.5,
+            "modifier": "log1p"
+          }
+        }
+      ],
+      "score_mode": "multiply",
+      "boost_mode": "multiply"
+    }
+  },
+  "sort": [
+    {
+      "_score": {
+        "order": "desc"
+      }
+    }
+  ]
+}
+
+### 3.2 Multiple Functions - 인기도와 재생 횟수 조합
+GET {{host}}/tracks/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "match": {
+          "genre": "rock"
+        }
+      },
+      "functions": [
+        {
+          "field_value_factor": {
+            "field": "popularity_score",
+            "factor": 1.0,
+            "modifier": "sqrt"
+          },
+          "weight": 2.0
+        },
+        {
+          "field_value_factor": {
+            "field": "play_count",
+            "factor": 0.0000000001,
+            "modifier": "log1p"
+          },
+          "weight": 1.5
+        }
+      ],
+      "score_mode": "sum",
+      "boost_mode": "multiply"
+    }
+  }
+}
+
+### 3.3 Script Score Function - 커스텀 점수 계산
+GET {{host}}/tracks/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "match_all": {}
+      },
+      "functions": [
+        {
+          "script_score": {
+            "script": {
+              "source": "Math.log(2 + doc['play_count'].value) * doc['rating'].value * doc['custom_boost'].value"
+            }
+          }
+        }
+      ],
+      "boost_mode": "replace"
+    }
+  }
+}
+
+### 3.4 Random Score - 무작위 정렬 (시드 기반)
+GET {{host}}/tracks/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "term": {
+          "genre": "pop"
+        }
+      },
+      "functions": [
+        {
+          "random_score": {
+            "seed": 12345,
+            "field": "_seq_no"
+          }
+        }
+      ],
+      "boost_mode": "replace"
+    }
+  }
+}
+
+### 3.5 Weight Function - 특정 조건에 가중치 적용
+GET {{host}}/tracks/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "match_all": {}
+      },
+      "functions": [
+        {
+          "filter": {
+            "terms": {
+              "tags": ["classic", "legendary"]
+            }
+          },
+          "weight": 3.0
+        },
+        {
+          "filter": {
+            "range": {
+              "release_date": {
+                "gte": "2010-01-01"
+              }
+            }
+          },
+          "weight": 1.5
+        }
+      ],
+      "score_mode": "sum",
+      "boost_mode": "multiply"
+    }
+  }
+}
+
+### 3.6 Gauss Decay Function - 날짜 기반 감쇠
+GET {{host}}/tracks/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "match_all": {}
+      },
+      "functions": [
+        {
+          "gauss": {
+            "release_date": {
+              "origin": "2020-01-01",
+              "scale": "365d",
+              "offset": "0d",
+              "decay": 0.5
+            }
+          }
+        }
+      ],
+      "boost_mode": "multiply"
+    }
+  }
+}
+
+### 3.7 Linear Decay Function - 인기도 점수 기반 선형 감쇠
+GET {{host}}/tracks/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "match_all": {}
+      },
+      "functions": [
+        {
+          "linear": {
+            "popularity_score": {
+              "origin": 10.0,
+              "scale": 2.0,
+              "offset": 0.5,
+              "decay": 0.3
+            }
+          }
+        }
+      ],
+      "boost_mode": "multiply"
+    }
+  }
+}
+
+### 3.8 Exponential Decay Function - 재생 횟수 기반 지수 감쇠
+GET {{host}}/tracks/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "match_all": {}
+      },
+      "functions": [
+        {
+          "exp": {
+            "play_count": {
+              "origin": 1000000000,
+              "scale": 500000000,
+              "offset": 0,
+              "decay": 0.5
+            }
+          }
+        }
+      ],
+      "boost_mode": "multiply"
+    }
+  }
+}
+
+### 3.9 복합 Function Score - 모든 요소 조합
+GET {{host}}/tracks/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "bool": {
+          "should": [
+            {
+              "match": {
+                "title": "queen"
+              }
+            },
+            {
+              "match": {
+                "artist": "drake"
+              }
+            }
+          ]
+        }
+      },
+      "functions": [
+        {
+          "field_value_factor": {
+            "field": "custom_boost",
+            "factor": 1.0,
+            "modifier": "sqrt"
+          },
+          "weight": 2.0
+        },
+        {
+          "script_score": {
+            "script": {
+              "source": "Math.log(1 + doc['rating'].value) * Math.log(1 + doc['popularity_score'].value)"
+            }
+          },
+          "weight": 1.5
+        },
+        {
+          "filter": {
+            "terms": {
+              "genre": ["rock", "pop"]
+            }
+          },
+          "weight": 1.8
+        },
+        {
+          "gauss": {
+            "release_date": {
+              "origin": "2000-01-01",
+              "scale": "10y",
+              "decay": 0.5
+            }
+          }
+        }
+      ],
+      "score_mode": "sum",
+      "boost_mode": "multiply",
+      "max_boost": 5.0,
+      "min_score": 0.1
+    }
+  },
+  "_source": ["title", "artist", "genre", "popularity_score", "rating", "custom_boost"],
+  "explain": true
+}

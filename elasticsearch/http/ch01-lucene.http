@@ -1,6 +1,9 @@
 ### default localhost info
 GET http://localhost:9200
 
+### get node info
+GET http://localhost:9200/_cat/nodes?v
+
 ### Elasticsearch plugins
 GET http://localhost:9200/_cat/plugins?format=json
 
